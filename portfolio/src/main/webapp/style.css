@@ -27,15 +27,11 @@
     width: 70%;
 }
 
-#longGap {
-    margin-top: 50%;
-}
-
 #myButton {
     margin-top: 1%; font-size:x-large;
 }
 
-#box {
+.box {
     margin-left: 10%;
     margin-right: 10%;
     margin-top: 2%;
@@ -119,6 +115,25 @@
 .myPic {
     border-radius: 50%;
     margin-top: 3%;
+}
+
+.longGap {
+    margin-top: 10%;
+}
+
+.comment {
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 5%;
+    padding: 2%;
+    border: 2px rgb(232, 231, 228) solid;
+    border-left-width: 4px;
+    border-left-color: 	rgb(184,184,184);
+    border-radius: 15px;
+}
+
+.successMsg {
+    margin-top: 40%;
 }
 
 header {
