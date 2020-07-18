@@ -1,28 +1,45 @@
-// Copyright 2019 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 /**
- * Adds a random greeting to the page.
- */
-function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
+Author: Yi Lyu
+Date:   2020.07.08
+Email:  isabella_aus_china@outlook.com
+*/
 
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+window.addEventListener("load", init);
 
-  // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
+function init() {
+    var path = window.location.pathname;
+    var page = path.split("/").pop();
+    console.log(page);
+    if (page == "comment.html") {
+        console.log("Aloha");
+        getAllComment();
+    }
+}
+
+// The page will jump to intro page
+function jumpToIntro() {
+    window.location.href="/intro.html";
+}
+
+// The page will jump to comment page
+function jumpToComment() {
+    window.location.replace("/comment.html");
+}
+
+function getAllComment() {
+    var allCommentElement = document.getElementById("commentCol");
+
+    fetch("/comment").then(response => response.json()).then(comments=> {
+        console.log("ALoha");
+        console.log(comments);
+        for (const [key, value] of Object.entries(comments)) {
+            var divElement = document.createElement("div");
+            divElement.setAttribute("class", "comment alignLeft");
+            
+            var spanElement = document.createElement("span");
+            spanElement.innerText = value;
+            divElement.appendChild(spanElement);
+            allCommentElement.appendChild(divElement);
+        };
+    });
 }
