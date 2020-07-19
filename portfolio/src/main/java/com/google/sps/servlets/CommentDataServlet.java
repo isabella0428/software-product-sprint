@@ -75,7 +75,6 @@ public class CommentDataServlet extends HttpServlet {
 
     int i = 0;
     for (Entity entity : results.asIterable()) {
-      datastore.
       jsonObj.put("comment" + Integer.toString(i), (String)entity.getProperty("content") + " " + (String)entity.getProperty("email"));
       ++i;
     }
