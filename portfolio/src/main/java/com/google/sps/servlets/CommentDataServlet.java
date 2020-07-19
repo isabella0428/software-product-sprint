@@ -23,20 +23,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Stack;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
 
 import org.json.simple.JSONObject;
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/comment")
 public class CommentDataServlet extends HttpServlet {
+  DatastoreService datastore;
+  
+  public CommentDataServlet() {
+    super();
+    this.datastore = DatastoreServiceFactory.getDatastoreService();
+  }
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String json = convertAllCommentsToJson();
@@ -46,46 +51,35 @@ public class CommentDataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String comment = request.getParameter("newComment");
+    String text = request.getParameter("newComment");
+    long timestamp = System.currentTimeMillis();
 
     UserService userService = UserServiceFactory.getUserService();
-    String text = request.getParameter("text");
     String email = userService.getCurrentUser().getEmail();
 
-    // Write comment to comment.txt file
-    FileWriter fw = new FileWriter("/Users/isabella/Desktop/SPS/software-product-sprint/portfolio/src/main/java/com/google/sps/servlets/comment.txt", true);
-    fw.write(comment);
-    fw.write(" ");
-    fw.write(email);
-    fw.write("\n");
-    fw.close();
+    Entity commentEntity = new Entity("Comment");
+    commentEntity.setProperty("content", text);
+    commentEntity.setProperty("email", email);
+    commentEntity.setProperty("timestamp", timestamp);
+
+    datastore.put(commentEntity);
 
     response.sendRedirect("/success.html");
   }
 
   private String convertAllCommentsToJson() {
-      JSONObject jsonObj = new JSONObject();
-      Stack<String> allComments = new Stack<String>();
+    JSONObject jsonObj = new JSONObject();
 
-      // Read All Comment from comment.txt
-      try {
-        BufferedReader br = new BufferedReader(new FileReader("/Users/isabella/Desktop/SPS/software-product-sprint/portfolio/src/main/java/com/google/sps/servlets/comment.txt"));
-        String line = "";
-        while((line = br.readLine()) != null) {
-            allComments.push(line);
-        }
-        br.close();
-      } catch(FileNotFoundException e) {
-          e.printStackTrace();
-      } catch(IOException e) {
-          e.printStackTrace();
+    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
+    PreparedQuery results = datastore.prepare(query);
+
+    int i = 0;
+    for (Entity entity : results.asIterable()) {
+      datastore.
+      jsonObj.put("comment" + Integer.toString(i), (String)entity.getProperty("content") + " " + (String)entity.getProperty("email"));
+      ++i;
     }
 
-      int i = 0;
-      while(!allComments.empty()) {
-        jsonObj.put("comment" + Integer.toString(i), allComments.pop());
-        ++i;
-      }
-      return jsonObj.toString();
+    return jsonObj.toString();
   }
 }

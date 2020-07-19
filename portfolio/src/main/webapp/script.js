@@ -39,8 +39,12 @@ function getAllComment() {
             const length = arr.length;
             const email = arr[length-1];
 
+            console.log(email);
+
             var content = arr.slice(0, arr.length-1).join(" ");
             content = email + ":\n      " + content;
+
+            console.log(content);
 
             var divElement = document.createElement("div");
             divElement.setAttribute("class", "comment alignLeft");
